@@ -30,10 +30,28 @@ public:
         std::vector<int> saved_spaces{};
 
         for (int i =0; i < row * col; i++) {
-            if (board_val[i-row] == -1 || board_val[i+row] == -1 || board_val[i-1] == -1 || board_val[i+1] == -1) {
-                int gen_num = distrib(gen);
-                if (gen_num == 5) {
-                    saved_spaces.push_back(i);
+            int gen_num = distrib(gen);
+            if (i <= row) {
+                if (board_val[i+row] == -1 || board_val[i+1] == -1) {
+                    if (gen_num == 5) {
+                        saved_spaces.push_back(i);
+                    }
+                }
+            }
+
+            else if (i >= (b_size-row)) {
+                if (board_val[i-row] == -1 || board_val[i-1] == -1) {
+                    if (gen_num == 5) {
+                        saved_spaces.push_back(i);
+                    }
+                }
+            }
+
+            else {
+                if (board_val[i-row] == -1 || board_val[i+row] == -1 || board_val[i-1] == -1 || board_val[i+1] == -1) {
+                    if (gen_num == 5) {
+                        saved_spaces.push_back(i);
+                    }
                 }
             }
         }
@@ -44,14 +62,16 @@ public:
 
         for (int i = 0; i < row * col; i++) {
             if (board_val[i] == -1) {
-                if (board_val[i-row-1] != -1 && i-row-1 >= 0) { board_val[i-row-1]++;}
-                if (board_val[i-row] != -1 && i-row >= 0) { board_val[i-row]++;}
-                if (board_val[i-row+1] != -1 && i-row+1 >= 0) { board_val[i-row+1]++;}
-                if (board_val[i-1] != -1 && i-1 >= 0) { board_val[i-1]++;}
-                if (board_val[i+1] != -1 && i+1 < row*col) { board_val[i+1]++;}
-                if (board_val[i+row-1] != -1 && i+row-1 < b_size) { board_val[i+row-1]++;}
-                if (board_val[i+row] != -1 && i+row < b_size) { board_val[i+row]++; }
-                if (board_val[i+row+1] != -1 && i+row+1 < b_size) { board_val[i+row+1]++;}
+                if (i-row-1 >= 0) { if (board_val[i-row-1] != -1 ) { board_val[i-row-1]++;}}
+                if (i-row >= 0) { if (board_val[i-row] != -1) { board_val[i-row]++;}}
+                if (i-row+1 >= 0) {if (board_val[i-row+1] != -1) { board_val[i-row+1]++;}}
+
+                if (i-1 >= 0) { if (board_val[i-1] != -1) { board_val[i-1]++;}}
+                if (i+1 < b_size) { if (board_val[i+1] != -1) { board_val[i+1]++;}}
+
+                if (i+row-1 < b_size) {if (board_val[i+row-1] != -1) { board_val[i+row-1]++;}}
+                if (i+row < b_size) {if (board_val[i+row] != -1) { board_val[i+row]++;}}
+                if (i+row+1 < b_size) {if (board_val[i+row+1] != -1) { board_val[i+row+1]++;}}
             }
         }
     };
@@ -83,7 +103,6 @@ public:
 private:
     std::array<int,b_size> board_val{0};
     std::array<int,b_size> board_visible{0};
-    bool running = true;
 };
 
 
