@@ -1,3 +1,0 @@
-C:/Users/svjat/CLionProject/Minesweeper/cmake-build-debug/CMakeFiles/Minesweeper.dir
-C:/Users/svjat/CLionProject/Minesweeper/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/svjat/CLionProject/Minesweeper/cmake-build-debug/CMakeFiles/rebuild_cache.dir
