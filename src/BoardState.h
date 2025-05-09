@@ -100,6 +100,10 @@ public:
         }
     }
 
+    static int GetBoardsize() {
+        return b_size;
+    }
+
 private:
     std::array<int,b_size> board_val{0};
     std::array<int,b_size> board_visible{0};
