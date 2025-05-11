@@ -85,23 +85,31 @@ public:
     }
 
     void TestViewBoard() {
-        for (int i = b_size/4; i < b_size*3/4; i++) {
-            board_visible[i] = 1;
+        for (int i = 0; i < b_size; i++) {
+            if (i >= b_size/4 and board_val[i] != -1) {
+                board_visible[i] = 1;
+            }
         }
     }
 
-    const sf::Texture CreateGridTextureValues(float block_size) {
-        sf::RenderTexture grid({800,800});
-        grid.clear(sf::Color(0,0,0,0));
-        grid.setRepeated(false);
+    void DrawGridTextureValues(sf::RenderWindow* window, float block_size, sf::Vector2f mouse_pos) {
+        // sf::RenderTexture grid({800,800});
+        // grid.clear(sf::Color(0,0,0,0));
 
         sf::Font font = sf::Font("../assets/FiraCode-SemiBold.ttf");
         sf::Text text = sf::Text(font);
         text.setCharacterSize(30);
-        text.setScale({1,-1});
+
+        int offset = 25;
 
         for (int i = 0; i < b_size; i++) {
             if (board_visible[i] == 1) {
+
+                sf::RectangleShape block({block_size,block_size});
+                block.setFillColor(mono_grey_medium);
+                block.setOutlineThickness(1.f);
+                block.setOutlineColor(sf::Color(0,0,0,255));
+
                 char val;
                 if (board_val[i] == -1) { val ='M'; }
                 else {val = board_val[i] + '0'; }
@@ -121,22 +129,39 @@ public:
                     default:
                         text.setFillColor(mono_red); break;
                 }
+
+                block.setPosition({static_cast<float>(i%row)*block_size+offset,static_cast<float>(i/row)*block_size+offset});
+                window->draw(block);
+
                 text.setString(val);
-                text.setPosition({static_cast<float>(i/row)*block_size+15,static_cast<float>(i%row)*block_size+block_size-5});
-                grid.draw(text);
+                text.setPosition({static_cast<float>(i%row)*block_size+offset+15,static_cast<float>(i/row)*block_size+offset+5});
+                window->draw(text);
             }
+
             else {
                 sf::RectangleShape block2({block_size,block_size});
-                block2.setPosition({static_cast<float>(i/row)*block_size,static_cast<float>(i%row)*block_size+block_size-50});
-                block2.setFillColor(mono_grey_medium_light);
+                block2.setPosition({static_cast<float>(i%row)*block_size+offset,static_cast<float>(i/row)*block_size+offset});
+                sf::Rect bounding_box = block2.getGlobalBounds();
+
+                if (bounding_box.contains(mouse_pos) && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left())) {
+                    board_visible[i] = 1;
+                }
+                else if (bounding_box.contains(mouse_pos)) {
+                    block2.setFillColor(mono_grey_light);
+                }
+                else {
+                    block2.setFillColor(mono_grey_medium_light);
+                }
                 block2.setOutlineThickness(1.f);
                 block2.setOutlineColor(sf::Color(0,0,0,255));
 
-                grid.draw(block2);
+                window->draw(block2);
             }
         }
 
-        return grid.getTexture();
+        // sf::Sprite sprite(grid.getTexture());
+        // sprite.setPosition({25,25});
+        // window->draw(sprite);
     }
 
     int GetMineCount() { return mine_count; }

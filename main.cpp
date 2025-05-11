@@ -2,7 +2,6 @@
 #include "src/ColorScheme.h"
 #include <SFML/Graphics.hpp>
 
-const sf::Texture CreateGridTexture(float block_size);
 const sf::Texture CreateScoreBoardTexture(int time_seconds, int mine_count);
 
 int main() {
@@ -10,41 +9,36 @@ int main() {
 
     bstate.TestViewBoard();
 
-    sf::RenderWindow window(sf::VideoMode({850,975}), "Minesweeper", sf::Style::Default);
+    sf::RenderWindow window(sf::VideoMode({850,975}), "Minesweeper", sf::Style::None);
     window.setFramerateLimit(30);
 
     float block_size = 50.f;
 
-    sf::Texture texture = CreateGridTexture(block_size);
-    sf::Texture texture2;
     sf::Texture texture3;
-    sf::Sprite sprite(texture);
-    sprite.setPosition({25,25});
 
     sf::Clock clock;
+    int game_state = 0;
+    // 0 is titlescreen, 1 is gamerunning,2 is game over
 
     while (window.isOpen()) {
         while (std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {window.close();}
+        }
+
+            sf::Vector2 mouse_pos = sf::Mouse::getPosition(window);
 
             window.clear(mono_grey_dark);
 
-            window.draw(sprite); //Grid Texture
-
-            texture2 = bstate.CreateGridTextureValues(block_size);
-            sf::Sprite sprite2(texture2);
-            sprite2.setTexture(texture2);
-            sprite2.setPosition({25,25});
-            window.draw(sprite2); //Grid Value Textures
+            bstate.DrawGridTextureValues(&window, block_size, sf::Vector2f(mouse_pos)); // Also handles player input
 
             texture3 = CreateScoreBoardTexture(clock.getElapsedTime().asSeconds(), bstate.GetMineCount());
             sf::Sprite sprite3(texture3);
-            sprite3.setTexture(texture3);
             sprite3.setPosition({25,850});
             window.draw(sprite3); // Scoreboard Texture
 
             window.display();
-        }
+
+
     }
 }
 
@@ -53,13 +47,12 @@ const sf::Texture CreateGridTexture(float block_size) {
     grid.clear(sf::Color(0,0,0,0));
 
     sf::RectangleShape block({block_size,block_size});
-    block.setPosition({0,0});
     block.setFillColor(mono_grey_medium);
     block.setOutlineThickness(1.f);
     block.setOutlineColor(sf::Color(0,0,0,255));
 
     for (int i = 0; i < b_size; i++) {
-        block.setPosition({static_cast<float>(i/row)*block_size,static_cast<float>(i%row)*block_size});
+        block.setPosition({static_cast<float>(i%row)*block_size,static_cast<float>(i/row)*block_size});
         grid.draw(block);
     }
 
