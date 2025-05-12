@@ -9,7 +9,7 @@ int main() {
 
     bstate.TestViewBoard();
 
-    sf::RenderWindow window(sf::VideoMode({850,975}), "Minesweeper", sf::Style::None);
+    sf::RenderWindow window(sf::VideoMode({850,975}), "Minesweeper", sf::Style::Default);
     window.setFramerateLimit(30);
 
     float block_size = 50.f;
@@ -38,25 +38,7 @@ int main() {
 
             window.display();
 
-
     }
-}
-
-const sf::Texture CreateGridTexture(float block_size) {
-    sf::RenderTexture grid({800,800});
-    grid.clear(sf::Color(0,0,0,0));
-
-    sf::RectangleShape block({block_size,block_size});
-    block.setFillColor(mono_grey_medium);
-    block.setOutlineThickness(1.f);
-    block.setOutlineColor(sf::Color(0,0,0,255));
-
-    for (int i = 0; i < b_size; i++) {
-        block.setPosition({static_cast<float>(i%row)*block_size,static_cast<float>(i/row)*block_size});
-        grid.draw(block);
-    }
-
-    return grid.getTexture();
 }
 
 const sf::Texture CreateScoreBoardTexture(int time_seconds, int mine_count) {

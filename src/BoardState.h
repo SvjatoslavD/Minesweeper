@@ -18,7 +18,7 @@
 class BoardState {
 public:
     BoardState() {
-        int max_distrib = 6;
+        int max_distrib = 7;
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution mine_distrib(0, max_distrib);
@@ -86,7 +86,7 @@ public:
 
     void TestViewBoard() {
         for (int i = 0; i < b_size; i++) {
-            if (i >= b_size/4 and board_val[i] != -1) {
+            if (i >= b_size*3/4 and board_val[i] != -1) {
                 board_visible[i] = 1;
             }
         }
@@ -144,7 +144,18 @@ public:
                 sf::Rect bounding_box = block2.getGlobalBounds();
 
                 if (bounding_box.contains(mouse_pos) && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left())) {
-                    board_visible[i] = 1;
+                    if (board_val[i] == 0) {
+                        std::vector<int> visited = {-1};
+                        RevealBlankSquares(i, visited);
+                        visited.clear();
+                    }
+                    else if (board_val[i] == -1) {
+                        std::cout << "Game Over" << std::endl;
+                        board_visible[i] = 1;
+                    }
+                    else {
+                        board_visible[i] = 1;
+                    }
                 }
                 else if (bounding_box.contains(mouse_pos)) {
                     block2.setFillColor(mono_grey_light);
@@ -166,11 +177,25 @@ public:
 
     int GetMineCount() { return mine_count; }
 
+    void RevealBlankSquares(int i, std::vector<int>& visited) {
+        auto it = std::find(visited.begin(), visited.end(), i);
+        if (board_val[i] == 0 and it == visited.end()) {
+            board_visible[i] = 1;
+            visited.push_back(i);
+
+            if (i+1 < b_size and i+1%row != 0) { RevealBlankSquares(i+1, visited);}
+            if (i-1 >= 0 and i-1%row != row) { RevealBlankSquares(i-1, visited);}
+
+            if (i+row < b_size) { RevealBlankSquares(i+row, visited);}
+            if (i-row >= 0) {  RevealBlankSquares(i-row, visited); }
+        }
+    }
+
 private:
     std::array<int,b_size> board_val{0};
     std::array<int,b_size> board_visible{0};
     int mine_count = 0;
-    int max_mine_count = 48;
+    int max_mine_count = 40;
 };
 
 
