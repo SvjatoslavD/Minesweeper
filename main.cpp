@@ -7,8 +7,6 @@ const sf::Texture CreateScoreBoardTexture(int time_seconds, int mine_count);
 int main() {
     BoardState bstate;
 
-    bstate.TestViewBoard();
-
     sf::RenderWindow window(sf::VideoMode({850,975}), "Minesweeper", sf::Style::Default);
     window.setFramerateLimit(30);
 

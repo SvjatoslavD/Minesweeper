@@ -183,11 +183,20 @@ public:
             board_visible[i] = 1;
             visited.push_back(i);
 
-            if (i+1 < b_size and i+1%row != 0) { RevealBlankSquares(i+1, visited);}
-            if (i-1 >= 0 and i-1%row != row) { RevealBlankSquares(i-1, visited);}
+            if (i+1 < b_size and (i+1)%row != 0) { RevealBlankSquares(i+1, visited);}
+            if (i-1 >= 0 and (i-1)%row != row-1) { RevealBlankSquares(i-1, visited);}
 
             if (i+row < b_size) { RevealBlankSquares(i+row, visited);}
             if (i-row >= 0) {  RevealBlankSquares(i-row, visited); }
+
+            if (i+1+row < b_size and (i+1)%row != 0) { RevealBlankSquares(i+1+row, visited);}
+            if (i-1+row < b_size and( i-1)%row != row) { RevealBlankSquares(i-1+row, visited);}
+
+            if (i+1-row >= 0 and (i+1)%row != 0) { RevealBlankSquares(i+1-row, visited);}
+            if (i-1-row >= 0 and (i-1)%row != row) { RevealBlankSquares(i-1-row, visited);}
+        }
+        else {
+            board_visible[i] = 1;
         }
     }
 
