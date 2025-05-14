@@ -2,71 +2,27 @@
 #include "src/ColorScheme.h"
 #include <SFML/Graphics.hpp>
 
-const sf::Texture CreateScoreBoardTexture(int time_seconds, int mine_count);
-
 int main() {
-    BoardState bstate;
-
     sf::RenderWindow window(sf::VideoMode({850,975}), "Minesweeper", sf::Style::Default);
     window.setFramerateLimit(30);
 
-    float block_size = 50.f;
-
-    sf::Texture texture3;
-
-    sf::Clock clock;
-    int game_state = 0;
-    // 0 is titlescreen, 1 is gamerunning,2 is game over
+    BoardState bstate(&window);
 
     while (window.isOpen()) {
         while (std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {window.close();}
         }
 
-            sf::Vector2 mouse_pos = sf::Mouse::getPosition(window);
+        bstate.HandleInput();
 
-            window.clear(mono_grey_dark);
+        bstate.ProcessGame();
 
-            bstate.DrawGridTextureValues(&window, block_size, sf::Vector2f(mouse_pos)); // Also handles player input
+        window.clear(mono_grey_dark); // This is always the background
 
-            texture3 = CreateScoreBoardTexture(clock.getElapsedTime().asSeconds(), bstate.GetMineCount());
-            sf::Sprite sprite3(texture3);
-            sprite3.setPosition({25,850});
-            window.draw(sprite3); // Scoreboard Texture
+        bstate.RenderGame();
 
-            window.display();
-
+        window.display();
     }
 }
 
-const sf::Texture CreateScoreBoardTexture(int time_seconds, int mine_count) {
-    sf::RenderTexture grid({800,100});
-    grid.clear(sf::Color(0,0,0,0));
-    grid.setRepeated(false);
 
-    sf::RectangleShape block2({800,100});
-    block2.setPosition({0,0});
-    block2.setFillColor(mono_grey_medium);
-    block2.setOutlineThickness(1.f);
-    block2.setOutlineColor(sf::Color(0,0,0,255));
-
-    grid.draw(block2);
-
-    sf::Font font = sf::Font("../assets/FiraCode-SemiBold.ttf");
-    sf::Text text = sf::Text(font);
-    text.setCharacterSize(60);
-    text.setScale({1,-1});
-    text.setFillColor(mono_grey_light);
-    text.setString(std::to_string(time_seconds)+"s");
-    text.setPosition({25,90});
-
-    grid.draw(text);
-
-    text.setFillColor(sf::Color::Black);
-    text.setString(std::to_string(mine_count)+"M");
-    text.setPosition({675,90});
-
-    grid.draw(text);
-
-    return grid.getTexture();
-}

@@ -1,15 +1,9 @@
 //
 // Created by svjat on 5/8/2025.
 //
-
 #ifndef BOARDSTATE_H
 #define BOARDSTATE_H
 
-#define row 16
-#define col 16
-#define b_size 256
-
-#include <array>
 #include <iostream>
 #include <random>
 #include <SFML/Graphics.hpp>
@@ -17,65 +11,56 @@
 
 class BoardState {
 public:
-    BoardState() {
-        int max_distrib = 7;
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution mine_distrib(0, max_distrib);
+    BoardState(sf::RenderWindow* render_window) {
+        window = render_window;
 
-        for (int i =0; i < row * col; i++) {
-            int gen_num = mine_distrib(gen);
-            if (gen_num == 0) {
-                board_val[i] = -1;
-                mine_count++;
-            }
-        }
+        row = 9;
+        col = 9;
+        b_size = row*col;
+        block_size = 800/col;
 
-        std::uniform_int_distribution space_distrib(0, b_size-1);
+        max_mine_count = 10;
 
-        // Populate the board with groups of mines
-        while (mine_count < max_mine_count) {
-            int gen_num = space_distrib(gen);
-            bool near = false;
-
-            if (gen_num+1 < b_size) { if (board_val[gen_num+1] == -1) { near = true; }}
-            if (gen_num-1 >= 0) { if (board_val[gen_num-1] == -1) { near = true; }}
-
-            if (gen_num+row < b_size) { if (board_val[gen_num+row] == -1) { near = true; }}
-            if (gen_num-row >= 0) {  if (board_val[gen_num-row] == -1) { near = true; }}
-
-            if (board_val[gen_num] != -1 and near) {
-                board_val[gen_num] = -1;
-                mine_count++;
-            }
-        }
-
-        for (int i = 0; i < row * col; i++) {
-            if (board_val[i] == -1) {
-                if (i-row-1 >= 0) { if (board_val[i-row-1] != -1 ) { board_val[i-row-1]++;}}
-                if (i-row >= 0) { if (board_val[i-row] != -1) { board_val[i-row]++;}}
-                if (i-row+1 >= 0) {if (board_val[i-row+1] != -1) { board_val[i-row+1]++;}}
-
-                if (i-1 >= 0) { if (board_val[i-1] != -1) { board_val[i-1]++;}}
-                if (i+1 < b_size) { if (board_val[i+1] != -1) { board_val[i+1]++;}}
-
-                if (i+row-1 < b_size) {if (board_val[i+row-1] != -1) { board_val[i+row-1]++;}}
-                if (i+row < b_size) {if (board_val[i+row] != -1) { board_val[i+row]++;}}
-                if (i+row+1 < b_size) {if (board_val[i+row+1] != -1) { board_val[i+row+1]++;}}
-            }
-        }
+        PopulateMines();
+        CalculateValuesOnGrid();
+        TestViewBoard();
     };
 
     ~BoardState() {};
 
-    void PrintBoardValues() {
+    void HandleInput() {
+        HandleKeyboard();
+    }
+
+    void ProcessGame() {
+
+    }
+
+    void RenderGame() {
+        switch (game_state) {
+            case 0:
+                DrawTitleScreen();
+                game_state = 1;
+                break;
+            case 1:
+                DrawGridTextureValues();
+                DrawScoreBoard();
+                break;
+            case 2:
+                DrawGameOverScreen();
+                break;
+        }
+
+    }
+
+    void TestPrintBoardValues() const {
         for (int i = 0; i < b_size; i++) {
             std::cout << board_val[i] << " ";
             if ((i+1)%row == 0) { std::cout << "\n"; }
         }
     };
 
-    void PrintBoardVisible() {
+    void TestPrintBoardVisible() const {
         for (int i = 0; i < b_size; i++) {
             if (board_visible[i] == 0) { std::cout << "x" << " "; }
             else { std::cout << board_val[i] << " "; }
@@ -86,25 +71,41 @@ public:
 
     void TestViewBoard() {
         for (int i = 0; i < b_size; i++) {
-            if (i >= b_size*3/4 and board_val[i] != -1) {
-                board_visible[i] = 1;
-            }
+            board_visible[i] = 1;
         }
     }
 
-    void DrawGridTextureValues(sf::RenderWindow* window, float block_size, sf::Vector2f mouse_pos) {
-        // sf::RenderTexture grid({800,800});
-        // grid.clear(sf::Color(0,0,0,0));
+private:
+    float first_click = true;
+    int game_state = 0;
 
-        sf::Font font = sf::Font("../assets/FiraCode-SemiBold.ttf");
-        sf::Text text = sf::Text(font);
-        text.setCharacterSize(30);
+    int row;
+    int col;
+    int b_size;
+    float block_size;
+
+    std::vector<int> board_val{};
+    std::vector<int> board_visible{};
+
+    int mine_count = 0;
+    int max_mine_count;
+
+    sf::RenderWindow* window;
+    sf::Clock clock;
+
+    sf::Font font = sf::Font("../assets/FiraCode-SemiBold.ttf");
+    sf::Text text = sf::Text(font);
+
+    void DrawTitleScreen() {}
+    void DrawGameOverScreen() {}
+
+    void DrawGridTextureValues() {
+        text.setCharacterSize(block_size*3/5);
 
         int offset = 25;
 
         for (int i = 0; i < b_size; i++) {
             if (board_visible[i] == 1) {
-
                 sf::RectangleShape block({block_size,block_size});
                 block.setFillColor(mono_grey_medium);
                 block.setOutlineThickness(1.f);
@@ -142,6 +143,7 @@ public:
                 sf::RectangleShape block2({block_size,block_size});
                 block2.setPosition({static_cast<float>(i%row)*block_size+offset,static_cast<float>(i/row)*block_size+offset});
                 sf::Rect bounding_box = block2.getGlobalBounds();
+                sf::Vector2 mouse_pos = sf::Vector2f(sf::Mouse::getPosition(*window));
 
                 if (bounding_box.contains(mouse_pos) && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left())) {
                     if (board_val[i] == 0) {
@@ -169,16 +171,36 @@ public:
                 window->draw(block2);
             }
         }
-
-        // sf::Sprite sprite(grid.getTexture());
-        // sprite.setPosition({25,25});
-        // window->draw(sprite);
     }
 
-    int GetMineCount() { return mine_count; }
+    const void DrawScoreBoard() {
+        float x_offset = 25;
+        float y_offset = 850;
+        sf::RectangleShape block2({800,100});
+        block2.setPosition({x_offset,y_offset});
+        block2.setFillColor(mono_grey_medium);
+        block2.setOutlineThickness(1.f);
+        block2.setOutlineColor(sf::Color(0,0,0,255));
+
+        window->draw(block2);
+
+        text.setCharacterSize(60);
+        text.setFillColor(mono_grey_light);
+        text.setString(std::to_string((int)clock.getElapsedTime().asSeconds())+"s");
+        text.setPosition({25+x_offset,10+y_offset});
+
+        window->draw(text);
+
+        text.setFillColor(sf::Color::Black);
+        text.setString(std::to_string(mine_count)+"M");
+        text.setPosition({665+x_offset,10+y_offset});
+
+        window->draw(text);
+    }
 
     void RevealBlankSquares(int i, std::vector<int>& visited) {
         auto it = std::find(visited.begin(), visited.end(), i);
+
         if (board_val[i] == 0 and it == visited.end()) {
             board_visible[i] = 1;
             visited.push_back(i);
@@ -200,13 +222,69 @@ public:
         }
     }
 
-private:
-    std::array<int,b_size> board_val{0};
-    std::array<int,b_size> board_visible{0};
-    int mine_count = 0;
-    int max_mine_count = 40;
+    void PopulateMines() {
+        int max_distrib = 7;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution mine_distrib(0, max_distrib);
+
+        for (int i =0; i < b_size; i++) {
+            board_visible.push_back(0); // This should be somewhere else
+            int gen_num = mine_distrib(gen);
+            if (gen_num == 0) {
+                board_val.push_back(-1);
+                mine_count++;
+            }
+            else {
+                board_val.push_back(0);
+            }
+        }
+
+        std::uniform_int_distribution space_distrib(0, b_size-1);
+
+        // Populate the board with groups of mines
+        while (mine_count < max_mine_count) {
+            int gen_num = space_distrib(gen);
+            bool near = false;
+
+            if (gen_num+1 < b_size) { if (board_val[gen_num+1] == -1) { near = true; }}
+            if (gen_num-1 >= 0) { if (board_val[gen_num-1] == -1) { near = true; }}
+
+            if (gen_num+row < b_size) { if (board_val[gen_num+row] == -1) { near = true; }}
+            if (gen_num-row >= 0) {  if (board_val[gen_num-row] == -1) { near = true; }}
+
+            if (board_val[gen_num] != -1 and near) {
+                board_val[gen_num] = -1;
+                mine_count++;
+            }
+        }
+    }
+
+    void CalculateValuesOnGrid() {
+        for (int i = 0; i < row * col; i++) {
+            if (board_val[i] == -1) {
+                if (i-row-1 >= 0) { if (board_val[i-row-1] != -1 ) { board_val[i-row-1]++;}}
+                if (i-row >= 0) { if (board_val[i-row] != -1) { board_val[i-row]++;}}
+                if (i-row+1 >= 0) {if (board_val[i-row+1] != -1) { board_val[i-row+1]++;}}
+
+                if (i-1 >= 0) { if (board_val[i-1] != -1) { board_val[i-1]++;}}
+                if (i+1 < b_size) { if (board_val[i+1] != -1) { board_val[i+1]++;}}
+
+                if (i+row-1 < b_size) {if (board_val[i+row-1] != -1) { board_val[i+row-1]++;}}
+                if (i+row < b_size) {if (board_val[i+row] != -1) { board_val[i+row]++;}}
+                if (i+row+1 < b_size) {if (board_val[i+row+1] != -1) { board_val[i+row+1]++;}}
+            }
+        }
+    }
+
+    void HandleKeyboard() {
+        switch (game_state) {
+            case 0:
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape)) {window->close();}
+                break;
+            case 1:
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape)) {game_state = 0;}
+        }
+    }
 };
-
-
-
 #endif //BOARDSTATE_H
