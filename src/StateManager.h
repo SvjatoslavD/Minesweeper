@@ -7,11 +7,14 @@
 #include <iostream>
 #include <random>
 #include <SFML/Graphics.hpp>
+
 #include "ColorScheme.h"
 
-class BoardState {
+
+
+class StateManager {
 public:
-    BoardState(sf::RenderWindow* render_window) {
+    StateManager(sf::RenderWindow* render_window) {
         window = render_window;
 
         row = 9;
@@ -26,14 +29,15 @@ public:
         TestViewBoard();
     };
 
-    ~BoardState() {};
+    ~StateManager() {};
 
     void HandleInput() {
         HandleKeyboard();
     }
 
     void ProcessGame() {
-
+        // CheckButtons();
+        // CheckGridCells();
     }
 
     void RenderGame() {
@@ -70,7 +74,7 @@ public:
     }
 
     void TestViewBoard() {
-        for (int i = 0; i < b_size; i++) {
+        for (int i = 0; i < b_size/2; i++) {
             board_visible[i] = 1;
         }
     }
@@ -284,6 +288,11 @@ private:
                 break;
             case 1:
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape)) {game_state = 0;}
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R)) {std::cout << "Restart" << std::endl;}
+                break;
+            case 2:
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape)) {window->close();}
+                break;
         }
     }
 };

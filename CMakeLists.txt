@@ -6,8 +6,17 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(SFML COMPONENTS Network Graphics Window Audio System CONFIG REQUIRED)
 
 add_executable(main main.cpp
-        src/BoardState.h
-        src/colorScheme.h)
+        src/StateManager.h
+        src/colorScheme.h
+
+        def/GameManager.cpp
+        src/GameManager.h
+        src/GameState.h
+        def/TitleState.cpp
+        src/TitleState.h
+        def/Button.cpp
+        src/Button.h
+)
 
 target_link_libraries(main PRIVATE
         SFML::Network SFML::Graphics SFML::Window SFML::Audio SFML::System

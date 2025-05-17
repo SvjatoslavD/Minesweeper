@@ -1,28 +1,13 @@
-#include "src/BoardState.h"
-#include "src/ColorScheme.h"
-#include <SFML/Graphics.hpp>
+#include "src/GameManager.h"
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode({850,975}), "Minesweeper", sf::Style::Default);
-    window.setFramerateLimit(30);
+    GameManager game;
 
-    BoardState bstate(&window);
-
-    while (window.isOpen()) {
-        while (std::optional event = window.pollEvent()) {
-            if (event->is<sf::Event::Closed>()) {window.close();}
-        }
-
-        bstate.HandleInput();
-
-        bstate.ProcessGame();
-
-        window.clear(mono_grey_dark); // This is always the background
-
-        bstate.RenderGame();
-
-        window.display();
+    while (game.Running()) {
+        game.HandleInput();
+        game.Update();
+        game.Draw();
     }
+
+    return 0;
 }
-
-
