@@ -9,11 +9,8 @@
 
 class TitleState: public GameState {
 public:
-    TitleState();
+    TitleState(GameManager* game);
     ~TitleState() override;
-
-    void Pause() override;
-    void Resume() override;
 
     void HandleInput(GameManager* game) override;
     void Update(GameManager* game) override;

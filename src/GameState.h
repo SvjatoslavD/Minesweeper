@@ -11,19 +11,20 @@
 
 class GameState {
 public:
-    GameState() {};
     virtual ~GameState() {};
 
-    virtual void Pause() {};
-    virtual void Resume() {};
+    void Pause() { paused = true; };
+    void Resume() { paused = false; };
+    bool IsPaused() { return paused;}
 
     virtual void HandleInput(GameManager* game) {};
     virtual void Update(GameManager* game) {};
     virtual void Draw(GameManager* game) {};
 
 protected:
+    GameState() {};
     sf::Texture background_tex;
-    std::vector<Button> buttons;
+    std::vector<Button*> buttons;
     bool paused = false;
 };
 

@@ -10,16 +10,23 @@
 #include <SFML/Window.hpp>
 
 GameManager::GameManager() {
-    this->window.create(sf::VideoMode({850, 975}), "Minesweeper", sf::Style::Default);
-    this->window.setFramerateLimit(30);
+    window.create(sf::VideoMode({850, 975}), "Minesweeper", sf::Style::Default);
+    window.setPosition({500, 0});
+    window.setFramerateLimit(30);
 
     running = true;
-    ChangeState(new TitleState());
+
+    font = sf::Font("../assets/FiraCode-SemiBold.ttf");
+
+    ChangeState(new TitleState(this));
 }
 
 GameManager::~GameManager() {
-    states.clear();
-    this->window.close();
+    while (!states.empty()) {
+        delete states.back();
+        states.pop_back();
+    }
+    window.close();
 }
 
 void GameManager::ChangeState(GameState* state) {
@@ -31,13 +38,21 @@ void GameManager::ChangeState(GameState* state) {
 }
 
 void GameManager::PushState(GameState* state) {
-    states.back()->Pause();
+    if (!states.empty()) {
+        states.back()->Pause();
+    }
     states.push_back(state);
 }
 
 void GameManager::PopState() {
-    states.pop_back();
-    states.back()->Resume();
+    if (!states.empty()) {
+        delete states.back();
+        states.pop_back();
+        states.back()->Resume();
+    }
+    else {
+        std::cerr << "No state to pop" << std::endl;
+    }
 }
 
 void GameManager::HandleInput() {

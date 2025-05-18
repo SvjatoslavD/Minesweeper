@@ -17,6 +17,6 @@ constexpr sf::Color mono_purple    = sf::Color(174, 129, 255);
 constexpr sf::Color mono_grey_dark     = sf::Color(39, 40, 34);
 constexpr sf::Color mono_grey_medium   = sf::Color(117, 113, 94);
 constexpr sf::Color mono_grey_medium_light = sf::Color(130,120,105);
-constexpr sf::Color mono_grey_light    = sf::Color(248, 248, 242);
+constexpr sf::Color mono_grey_light    = sf::Color(200, 200, 200);
 
 #endif //COLORSCHEME_H

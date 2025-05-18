@@ -34,11 +34,13 @@ public:
     }
 
     sf::RenderWindow* GetWindow() {return &window;}
+    sf::Font* GetFont() {return &font;}
 
 private:
     sf::RenderWindow window;
     std::vector<GameState*> states;
     bool running;
+    sf::Font font;
 };
 
 #endif //GAMEMANAGER_H

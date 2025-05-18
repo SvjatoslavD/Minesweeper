@@ -16,6 +16,8 @@ add_executable(main main.cpp
         src/TitleState.h
         def/Button.cpp
         src/Button.h
+        def/PlayingState.cpp
+        src/PlayingState.h
 )
 
 target_link_libraries(main PRIVATE

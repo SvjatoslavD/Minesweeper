@@ -12,14 +12,16 @@ class GameManager;
 
 class Button {
 public:
-    Button(float x, float y, float h, float w, const std::string& name, sf::Color standard, sf::Color hover);
+    Button(float x, float y, float h, float w, std::string string, sf::Color standard, sf::Color hover, GameManager* game);
     ~Button();
 
-    bool ContainsMouse(GameManager* game);
+    bool GetContainsMouse(GameManager* game);
+    bool GetClicked(GameManager* game);
     void Draw(GameManager* game);
+    std::string GetString();
 
 protected:
-    std::string name;
+    sf::Text text;
     sf::RectangleShape info;
     sf::Color standard;
     sf::Color hover;
