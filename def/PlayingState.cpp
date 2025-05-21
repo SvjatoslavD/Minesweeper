@@ -3,7 +3,11 @@
 //
 
 #include "../src/PlayingState.h"
+
+#include <iostream>
+
 #include "../src/GameManager.h"
+#include "../src/GridCell.h"
 
 PlayingState::PlayingState(std::string diff, GameManager* game): diff(diff) {
     //Make background texture
@@ -34,30 +38,41 @@ PlayingState::PlayingState(std::string diff, GameManager* game): diff(diff) {
     Button *b1 = new Button(580, 870, 60, 225, "Rules", mono_grey_medium_light, mono_grey_light, game);
     buttons.push_back(b1);
 
+    // Initialize variables
     if (diff == "Easy") {
         player_mine_count = 20;
         row = 10;
         col = 10;
         board_size = row * col;
+        block_size = 800.f/ row;
     }
     else if (diff == "Medium") {
         player_mine_count = 35;
         row = 12;
         col = 12;
         board_size = row * col;
+        block_size = 800.f/ row;
     }
     else if (diff == "Hard") {
         player_mine_count = 50;
         row = 15;
         col = 15;
         board_size = row * col;
+        block_size = 800.f/ row;
     }
+
+    // Creating the board
+    PopulateGridCells(game);
 }
 
 PlayingState::~PlayingState() {
     while (!buttons.empty()) {
         delete buttons.back();
         buttons.pop_back();
+    }
+    while (!grid_cells.empty()) {
+        delete grid_cells.back();
+        grid_cells.pop_back();
     }
 }
 
@@ -70,7 +85,10 @@ void PlayingState::HandleInput(GameManager* game) {
 void PlayingState::Update(GameManager* game) {
     if (!paused && !buttons.empty()) {
         for (Button* button : buttons) {
-
+            ;
+        }
+        for (GridCell* grid_cell : grid_cells) {
+            grid_cell->GetMouseClick(game, clock.getElapsedTime().asMilliseconds());
         }
     }
 }
@@ -81,19 +99,23 @@ void PlayingState::Draw(GameManager* game) {
         //This is to make sure that the RenderTexture isn't displayed upside down
         sprite.setScale({1,-1});
         sprite.setPosition({0, 975});
-
         game->GetWindow()->draw(sprite);
 
         UpdateScoreBoard(game);
         sf::Sprite sprite2(score_board_tex);
         sprite2.setScale({1,-1});
         sprite2.setPosition({25, 950});
-
         game->GetWindow()->draw(sprite2);
 
         if (!buttons.empty()) {
             for (Button* button : buttons) {
                 button->Draw(game);
+            }
+        }
+
+        if (!grid_cells.empty()) {
+            for (GridCell* cell : grid_cells) {
+                cell->Draw(game);
             }
         }
     }
@@ -123,4 +145,12 @@ void PlayingState::UpdateScoreBoard(GameManager* game) {
     rt.draw(text);
 
     score_board_tex = rt.getTexture();
+}
+
+void PlayingState::PopulateGridCells(GameManager* game) {
+    int offset = 25;
+    for (int i = 0; i < board_size; i++) {
+        auto *gc = new GridCell((i % row) * block_size + offset, (i / col) * block_size + offset, block_size, block_size, mono_grey_medium_light, mono_grey_light, game);
+        grid_cells.push_back(gc);
+    }
 }

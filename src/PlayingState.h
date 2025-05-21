@@ -6,6 +6,7 @@
 #define PLAYINGSTATE_H
 
 #include "GameState.h"
+#include "GridCell.h"
 
 class PlayingState: public GameState {
 public:
@@ -15,9 +16,9 @@ public:
     void HandleInput(GameManager* game) override;
     void Update(GameManager* game) override;
     void Draw(GameManager* game) override;
-    void UpdateScoreBoard(GameManager* game);
 
 private:
+    //Game state variables
     std::string diff;
     sf::Clock clock;
     sf::Texture score_board_tex;
@@ -27,7 +28,13 @@ private:
     int row;
     int col;
     int board_size;
+    float block_size;
     bool first_click = true;
+
+    std::vector<GridCell*> grid_cells;
+
+    void PopulateGridCells(GameManager* game);
+    void UpdateScoreBoard(GameManager* game);
 };
 
 

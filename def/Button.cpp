@@ -7,7 +7,6 @@
 #include <iostream>
 
 #include "../src/GameManager.h"
-
 Button::Button(float x, float y, float h, float w, const std::string string, sf::Color standard, sf::Color hover, GameManager* game): text(*game->GetFont()) {
     info.setSize({w, h});
     info.setPosition({x, y});

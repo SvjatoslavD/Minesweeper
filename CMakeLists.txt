@@ -18,6 +18,8 @@ add_executable(main main.cpp
         src/Button.h
         def/PlayingState.cpp
         src/PlayingState.h
+        def/GridCell.cpp
+        src/GridCell.h
 )
 
 target_link_libraries(main PRIVATE
