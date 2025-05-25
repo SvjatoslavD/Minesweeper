@@ -56,10 +56,11 @@ void GameManager::PopState() {
 }
 
 void GameManager::HandleInput() {
-    while (const auto event = window.pollEvent()) {
+    while (auto event = window.pollEvent()) {
         if (event->is<sf::Event::Closed>()) { running = false; }
+
+        states.back()->HandleInput(this, *event);
     }
-    states.back()->HandleInput(this);
 }
 
 void GameManager::Update() {

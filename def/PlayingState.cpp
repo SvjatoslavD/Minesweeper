@@ -76,20 +76,29 @@ PlayingState::~PlayingState() {
     }
 }
 
-void PlayingState::HandleInput(GameManager* game) {
-    if (!paused) {
-        if (isKeyPressed(sf::Keyboard::Key::Escape)) {game->Quit();}
-    }
-}
+void PlayingState::HandleInput(GameManager* game, sf::Event& event) {
+            if (const auto* mouse_button = event.getIf<sf::Event::MouseButtonPressed>()) {
+                if (mouse_button->button == sf::Mouse::Button::Left) {
+                    for (GridCell* grid_cell : grid_cells) {
+                        grid_cell->MouseClickLeft(game, this);
+                    }
+                }
+                else if (mouse_button->button == sf::Mouse::Button::Right) {
+                    for (GridCell* grid_cell : grid_cells) {
+                        grid_cell->MouseClickRight(game, this);
+                    }
+                }
+            }
+        }
+
+
 
 void PlayingState::Update(GameManager* game) {
     if (!paused && !buttons.empty()) {
         for (Button* button : buttons) {
             ;
         }
-        for (GridCell* grid_cell : grid_cells) {
-            grid_cell->GetMouseClick(game, clock.getElapsedTime().asMilliseconds());
-        }
+
     }
 }
 
@@ -147,10 +156,12 @@ void PlayingState::UpdateScoreBoard(GameManager* game) {
     score_board_tex = rt.getTexture();
 }
 
-void PlayingState::PopulateGridCells(GameManager* game) {
+void PlayingState::CreateGridCells(GameManager* game) {
     int offset = 25;
     for (int i = 0; i < board_size; i++) {
         auto *gc = new GridCell((i % row) * block_size + offset, (i / col) * block_size + offset, block_size, block_size, mono_grey_medium_light, mono_grey_light, game);
         grid_cells.push_back(gc);
     }
 }
+
+

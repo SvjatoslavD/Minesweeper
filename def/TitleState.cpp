@@ -47,7 +47,7 @@ TitleState::~TitleState() {
     }
 }
 
-void TitleState::HandleInput(GameManager* game) {
+void TitleState::HandleInput(GameManager* game, sf::Event& event) {
     if (!paused) {
         if (isKeyPressed(sf::Keyboard::Key::Escape)) {game->Quit();}
     }

@@ -17,7 +17,7 @@ public:
     void Resume() { paused = false; };
     bool IsPaused() { return paused;}
 
-    virtual void HandleInput(GameManager* game) {};
+    virtual void HandleInput(GameManager* game, sf::Event& event) {};
     virtual void Update(GameManager* game) {};
     virtual void Draw(GameManager* game) {};
 

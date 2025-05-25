@@ -13,16 +13,19 @@ public:
     PlayingState(std::string diff, GameManager* game);
     ~PlayingState() override;
 
-    void HandleInput(GameManager* game) override;
+    void HandleInput(GameManager* game, sf::Event& event) override;
     void Update(GameManager* game) override;
     void Draw(GameManager* game) override;
+    int GetMineCount() const {return player_mine_count;}
+    void DecMineCount() {player_mine_count--;}
+    void IncMineCount() {player_mine_count++;}
 
 private:
     //Game state variables
     std::string diff;
     sf::Clock clock;
     sf::Texture score_board_tex;
-    //Game variables
+    //Game play variables
     int player_mine_count;
     int true_mine_count = 0;
     int row;
@@ -33,7 +36,7 @@ private:
 
     std::vector<GridCell*> grid_cells;
 
-    void PopulateGridCells(GameManager* game);
+    void CreateGridCells(GameManager* game);
     void UpdateScoreBoard(GameManager* game);
 };
 

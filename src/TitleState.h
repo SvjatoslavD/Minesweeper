@@ -12,7 +12,7 @@ public:
     TitleState(GameManager* game);
     ~TitleState() override;
 
-    void HandleInput(GameManager* game) override;
+    void HandleInput(GameManager* game, sf::Event& event) override;
     void Update(GameManager* game) override;
     void Draw(GameManager* game) override;
 };

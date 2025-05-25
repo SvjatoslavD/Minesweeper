@@ -6,13 +6,15 @@
 #define GRIDCELL_H
 
 #include "Button.h"
+class PlayingState;
 
 class GridCell: public Button {
 public:
     GridCell(float x, float y, float h, float w, sf::Color standard, sf::Color hover, GameManager* game);
     ~GridCell();
 
-    void GetMouseClick(GameManager* game, float timePassed);
+    void MouseClickRight(GameManager* game, PlayingState* playing_state);
+    void MouseClickLeft(GameManager* game, PlayingState* playing_state);
     bool LostGame();
     void Draw(GameManager* game);
 

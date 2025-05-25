@@ -3,7 +3,11 @@
 //
 
 #include "../src/GridCell.h"
+
+#include <iostream>
+
 #include "../src/GameManager.h"
+#include "../src/PlayingState.h"
 
 GridCell::GridCell(float x, float y, float h, float w, sf::Color standard, sf::Color hover, GameManager* game): Button(x, y, h, w, "", standard, hover, game) {
     this->standard = standard;
@@ -24,16 +28,35 @@ GridCell::GridCell(float x, float y, float h, float w, sf::Color standard, sf::C
 
 GridCell::~GridCell() {}
 
-void GridCell::GetMouseClick(GameManager* game, float timePassed) {
-    if (timePassed < 500) {;}
-    else {
-        if (GetContainsMouse(game) && isButtonPressed(sf::Mouse::Button::Left)) {
+void GridCell::MouseClickLeft(GameManager* game, PlayingState* playing_state) {
+        if (GetContainsMouse(game)) {
+            if (visible == 2) {playing_state->IncMineCount();}
             visible = 0;
             info.setFillColor(mono_grey_medium);
             text.setString(std::to_string(value));
         }
-        else if (GetContainsMouse(game) && isButtonPressed(sf::Mouse::Button::Right)) {
+}
 
+void GridCell::MouseClickRight(GameManager* game, PlayingState* playing_state) {
+    if (GetContainsMouse(game)) {
+        if (visible == 1) {
+            if (playing_state->GetMineCount() == 0) {
+                std::cout << "Can't Decrease Mine Count" << std::endl;
+            }
+            else {
+                visible = 2;
+                text.setString("M");
+                playing_state->DecMineCount();
+            }
+        }
+        else if (visible == 2) {
+            visible = 3;
+            text.setString("?");
+            playing_state->IncMineCount();
+        }
+        else if (visible == 3) {
+            text.setString("");
+            visible = 1;
         }
     }
 }
